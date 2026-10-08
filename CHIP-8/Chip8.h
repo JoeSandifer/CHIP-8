@@ -4,6 +4,9 @@
 class Chip8
 {
 public:
+	Chip8();
+	void LoadROM(char const* filename);
+
 	uint8_t registers[16]{};
 	uint8_t memory[4096]{};
 	uint16_t index{};
@@ -14,6 +17,4 @@ public:
 	uint8_t keypad[16]{};
 	uint32_t video[64 * 32]{};
 	uint16_t opcode;
-
-	void LoadROM(char const* filename);
 };
