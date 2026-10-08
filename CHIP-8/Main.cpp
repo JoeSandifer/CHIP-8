@@ -13,14 +13,21 @@ int main(int argc, char** argv)
         std::exit(EXIT_FAILURE);
     }
 
-    int videoScale = std::stoi(argv[1]);
-    int cycleDelay = std::stoi(argv[2]);
-    char const* romFilename = argv[3];
+    int videoScale = 10;
+    int cycleDelay = 1667;
+    
+
+    std::string romFilename = OpenROMFile();
+
+    if (romFilename.empty())
+    {
+        return 0;
+    }
 
     Platform platform("CHIP-8 Emulator", VIDEO_WIDTH * videoScale, VIDEO_HEIGHT * videoScale, VIDEO_WIDTH, VIDEO_HEIGHT);
 
     Chip8 chip8;
-    chip8.LoadROM(romFilename);
+    chip8.LoadROM(romFilename.c_str());
 
     int videoPitch = sizeof(chip8.video[0]) * VIDEO_WIDTH;
 

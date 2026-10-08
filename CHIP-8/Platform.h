@@ -1,8 +1,31 @@
 #pragma once
 #include <SDL.h>
+#include <windows.h>
+#include <commdlg.h>
+#include <string>
 
 constexpr unsigned int VIDEO_WIDTH = 64;
 constexpr unsigned int VIDEO_HEIGHT = 32;
+
+inline std::string OpenROMFile()
+{
+	char filename[MAX_PATH] = "";
+
+	OPENFILENAMEA ofn{};
+	ofn.lStructSize = sizeof(ofn);
+	ofn.lpstrFile = filename;
+	ofn.nMaxFile = MAX_PATH;
+	ofn.lpstrFilter = "CHIP-8 ROMs (*.ch8)\0*.ch8\0All Files (*.*)\0*.*\0";
+	ofn.nFilterIndex = 1;
+	ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
+
+	if (GetOpenFileNameA(&ofn))
+	{
+		return filename;
+	}
+
+	return "";
+}
 
 class Platform
 {
@@ -11,7 +34,7 @@ public:
 	{
 		SDL_Init(SDL_INIT_VIDEO);
 
-		window = SDL_CreateWindow(title, 0, 0, windowWidth, windowHeight, SDL_WINDOW_SHOWN);
+		window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, SDL_WINDOW_SHOWN);
 
 		renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
