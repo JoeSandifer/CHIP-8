@@ -1,9 +1,10 @@
-#include <iostream>
-
-using namespace std;
+#include "Chip8.h"
 
 int main()
 {
-	cout << "hello";
-	return 0;
+    Chip8 chip8;
+
+    chip8.LoadROM("test.ch8");
+
+    return 0;
 }
