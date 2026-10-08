@@ -69,7 +69,7 @@ public:
 	{}
 
 	std::default_random_engine randGen;
-	std::uniform_int_distribution<uint8_t> randByte;
+	std::uniform_int_distribution<int> randByte;
 
 	uint8_t registers[16]{};
 	uint8_t memory[4096]{};
@@ -82,8 +82,7 @@ public:
 	uint8_t keypad[16]{};
 	uint32_t video[64 * 32]{};
 	uint16_t opcode;
-	uint8_t VIDEO_WIDTH;
-	uint8_t VIDEO_HEIGHT;
+
 
 
 	typedef void (Chip8::* Chip8Func)();

@@ -1,5 +1,6 @@
 #include "Chip8.h"
 #include <fstream>
+#include <iostream>
 
 const unsigned int START_ADDRESS = 0x200;
 
@@ -56,7 +57,7 @@ Chip8::Chip8()
 	: randGen(std::chrono::system_clock::now().time_since_epoch().count())
 {
 
-	randByte = std::uniform_int_distribution<uint8_t>(0, 255U);
+	randByte = std::uniform_int_distribution<int>(0, 255U);
 
 	table[0x0] = &Chip8::Table0;
 	table[0x1] = &Chip8::OP_1nnn;
@@ -360,15 +361,15 @@ void Chip8::OP_Cxkk()
 }
 
 // Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision
+
 void Chip8::OP_Dxyn()
 {
 	uint8_t Vx = (opcode & 0x0F00u) >> 8u;
 	uint8_t Vy = (opcode & 0x00F0u) >> 4u;
 	uint8_t height = opcode & 0x000Fu;
 
-	// Wrap if going beyond the screen boundaries
-	uint8_t xPos = registers[Vx] % VIDEO_WIDTH;
-	uint8_t ypos = registers[Vy] % VIDEO_HEIGHT;
+	uint8_t xPos = registers[Vx] % 64;
+	uint8_t ypos = registers[Vy] % 32;
 
 	registers[0xF] = 0;
 
@@ -379,18 +380,19 @@ void Chip8::OP_Dxyn()
 		for (unsigned int col = 0; col < 8; ++col)
 		{
 			uint8_t spritePixel = spriteByte & (0x80u >> col);
-			uint32_t* screenPixel = &video[(ypos + row) * VIDEO_WIDTH + (xPos + col)];
 
-			// Sprite piel is on
+			uint8_t x = (xPos + col) % 64;
+			uint8_t y = (ypos + row) % 32;
+
+			uint32_t* screenPixel = &video[y * 64 + x];
+
 			if (spritePixel)
 			{
-				// Screen pixel also on - collision
 				if (*screenPixel == 0xFFFFFFFF)
 				{
 					registers[0xF] = 1;
 				}
 
-				// Effectiverly XOR with the sprite pixel
 				*screenPixel ^= 0xFFFFFFFF;
 			}
 		}
@@ -582,6 +584,12 @@ void Chip8::OP_Fx65()
 void Chip8::Cycle()
 {
 	// Fetch
+	if (pc >= 4096 || pc + 1 >= 4096)
+	{
+		std::cerr << "Program counter out of bounds: " << pc << '\n';
+		return;
+	}
+
 	opcode = (memory[pc] << 8u) | memory[pc + 1];
 
 	// Increment the PC before we execute
